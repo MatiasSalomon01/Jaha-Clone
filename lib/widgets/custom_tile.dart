@@ -15,30 +15,46 @@ class CustomTile extends StatelessWidget {
           contentPadding:
               EdgeInsets.symmetric(vertical: verticalPadding, horizontal: 20),
           minLeadingWidth: 0,
-          leading: Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Icon(
-              model.icon,
-              color: white,
-              size: model.iconSize,
+          leading: model.title.startsWith('Eliminar')
+              ? const Padding(
+                  padding: EdgeInsets.only(right: 0),
+                  child: Icon(
+                    Icons.credit_card_off,
+                    color: white,
+                    size: 27,
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Icon(
+                    model.icon,
+                    color: white,
+                    size: model.iconSize,
+                  ),
+                ),
+          title: Padding(
+            padding: EdgeInsets.only(
+                left: model.title.startsWith('Eliminar') ? 0 : 5),
+            child: Text(
+              model.title,
+              style: const TextStyle(color: white, fontSize: 20),
             ),
-          ),
-          title: Text(
-            model.title,
-            style: const TextStyle(color: white, fontSize: 20),
           ),
           subtitle: model.subTitle == null
               ? null
-              : Text(
-                  model.subTitle!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: white),
+              : Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    model.subTitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: white),
+                  ),
                 ),
           trailing: model.isFavorite == null
               ? null
               : Padding(
-                  padding: const EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.only(right: 10),
                   child: Icon(
                     model.isFavorite!
                         ? Icons.star_rounded

@@ -9,9 +9,10 @@ final List<Model> busesData = [
   Model(title: '30', subTitle: 'VANGUARDIA S.A.C.I.', isFavorite: false),
   Model(title: '454', subTitle: '3 DE FEBRERO S.A.', isFavorite: false),
   Model(
-      title: '1',
-      subTitle: 'EMPRESA DE TRANSPORTE Y TU TRANSPORTE',
-      isFavorite: false),
+    title: '1',
+    subTitle: 'EMPRESA DE TRANSPORTE Y TU TRANSPORTE',
+    isFavorite: false,
+  ),
   Model(title: '5 CH', subTitle: 'LA CHAQUEÑA S.A.T.C', isFavorite: false),
   Model(title: '11', subTitle: 'GRUPO BENE S.A.', isFavorite: false),
   Model(title: '6', subTitle: 'POA RENDA SRL', isFavorite: false),
@@ -25,7 +26,7 @@ final List<Model> cardData = [
     iconSize: 20,
   ),
   Model(
-    title: 'Elminar Tarjeta',
+    title: 'Eliminar Tarjeta',
     icon: FontAwesomeIcons.solidCreditCard,
     iconSize: 20,
   ),
