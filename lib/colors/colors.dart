@@ -8,7 +8,7 @@ const white = Colors.white;
 const grey = Colors.grey;
 const green = Color(0xff6abf4a);
 const purple = Color(0xffa55a95);
-const blue = Color(0xff008fbe);
-const colors = [yellow, green, purple, blue];
+const lightBlue = Color(0xff00c2de);
+const colors = [yellow, green, purple, lightBlue];
 
 Color getRandomColor() => colors[Random().nextInt(colors.length)];

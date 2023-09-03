@@ -1,27 +1,30 @@
 import 'package:ans_map_project/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 import '../colors/colors.dart';
+import '../providers/color_provider.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorProvider = Provider.of<ColorProvider>(context);
     return Theme(
       data: Theme.of(context).copyWith(
         splashColor: transparent,
         highlightColor: white.withOpacity(.2),
       ),
       child: BottomNavigationBar(
+        backgroundColor: colorProvider.appColor,
         type: BottomNavigationBarType.fixed,
         enableFeedback: false,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         unselectedItemColor: white,
         selectedItemColor: white,
-        backgroundColor: yellow,
         currentIndex: 0,
         iconSize: 22,
         items: const [

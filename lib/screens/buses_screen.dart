@@ -1,15 +1,18 @@
 import 'package:ans_map_project/data/data.dart';
 import 'package:ans_map_project/widgets/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../colors/colors.dart';
+import '../providers/color_provider.dart';
 
 class BusesScreen extends StatelessWidget {
   const BusesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorProvider = Provider.of<ColorProvider>(context);
     return Scaffold(
-      backgroundColor: yellow,
+      backgroundColor: colorProvider.appColor,
       appBar: const CustomAppBar(),
       body: Column(
         children: [

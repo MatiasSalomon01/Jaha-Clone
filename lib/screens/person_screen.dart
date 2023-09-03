@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../colors/colors.dart';
 import '../data/data.dart';
+import '../providers/color_provider.dart';
 import '../widgets/widgets.dart';
 
 class PersonScreen extends StatelessWidget {
@@ -9,8 +11,9 @@ class PersonScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorProvider = Provider.of<ColorProvider>(context);
     return Scaffold(
-      backgroundColor: yellow,
+      backgroundColor: colorProvider.appColor,
       appBar: const CustomAppBar(),
       body: Column(
         children: [

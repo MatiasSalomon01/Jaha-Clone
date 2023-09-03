@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../colors/colors.dart';
+import 'package:provider/provider.dart';
+import '../providers/color_provider.dart';
 import '../widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -7,9 +8,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorProvider = Provider.of<ColorProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: yellow,
+        backgroundColor: colorProvider.appColor,
         elevation: 0,
         centerTitle: true,
         title: Image.asset(

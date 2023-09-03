@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../colors/colors.dart';
+import '../providers/color_provider.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorProvider = Provider.of<ColorProvider>(context);
     return AppBar(
-      backgroundColor: yellow,
+      backgroundColor: colorProvider.appColor,
       elevation: 0,
       centerTitle: true,
       title: Image.asset(
@@ -19,12 +22,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: const CircleAvatar(
+            child: CircleAvatar(
               backgroundColor: white,
               radius: 14,
               child: Icon(
                 Icons.arrow_back,
-                color: yellow,
+                color: colorProvider.appColor,
               ),
             ),
           ),
