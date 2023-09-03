@@ -46,4 +46,5 @@ app.*.map.json
 /macos
 /linux
 /ios
+/android/app/src/main/AndroidManifest.xml
 
