@@ -2,9 +2,9 @@ import 'package:ans_map_project/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-
 import '../colors/colors.dart';
 import '../providers/color_provider.dart';
+import 'widgets.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   const CustomBottomNavigationBar({super.key});
@@ -33,7 +33,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.store),
+            icon: PopUpOptions(),
             label: '',
           ),
           BottomNavigationBarItem(
@@ -54,6 +54,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
             case 0:
               Navigator.pushNamed(context, Routes.BUSES);
               break;
+            // case 1:
+            //   _showOptionsDialog(context);
+            //   break;
             case 3:
               Navigator.pushNamed(context, Routes.CARD);
               break;
@@ -66,4 +69,43 @@ class CustomBottomNavigationBar extends StatelessWidget {
       ),
     );
   }
+
+  // void _showOptionsDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     barrierColor: transparent,
+  //     builder: (BuildContext context) {
+  //       return Padding(
+  //         padding: const EdgeInsets.only(bottom: 30),
+  //         child: AlertDialog(
+  //           shape:
+  //               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+  //           insetPadding: EdgeInsets.zero,
+  //           contentPadding: EdgeInsets.zero,
+  //           alignment: Alignment.bottomRight,
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               CheckboxListTile(
+  //                 value: true,
+  //                 title: const Text('Paradas de buses'),
+  //                 onChanged: (value) {},
+  //               ),
+  //               CheckboxListTile(
+  //                 value: true,
+  //                 title: const Text('Paradas de buses'),
+  //                 onChanged: (value) {},
+  //               ),
+  //               CheckboxListTile(
+  //                 value: true,
+  //                 title: const Text('Paradas de buses'),
+  //                 onChanged: (value) {},
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 }
