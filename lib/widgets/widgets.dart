@@ -1,3 +1,4 @@
+export 'package:ans_map_project/widgets/location_input.dart';
 export 'package:ans_map_project/widgets/pop_up_options.dart';
 export 'package:ans_map_project/widgets/custom_tile.dart';
 export 'package:ans_map_project/widgets/search_tile.dart';
