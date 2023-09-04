@@ -1,5 +1,5 @@
 import 'package:ans_map_project/colors/colors.dart';
-import 'package:ans_map_project/providers/color_provider.dart';
+import 'package:ans_map_project/providers/providers.dart';
 import 'package:ans_map_project/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +18,8 @@ class AppState extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => ColorProvider(appColor: color),
-        )
+        ),
+        ChangeNotifierProvider(create: (context) => BusProvider())
       ],
       child: const MainApp(),
     );

@@ -1,7 +1,7 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/color_provider.dart';
+import '../providers/providers.dart';
 
 class PopUpOptions extends StatefulWidget {
   const PopUpOptions({
@@ -16,6 +16,7 @@ class _PopUpOptionsState extends State<PopUpOptions> {
   @override
   Widget build(BuildContext context) {
     final colorProvider = Provider.of<ColorProvider>(context);
+    final busProvider = Provider.of<BusProvider>(context);
     bool buses = false;
     bool ventas = false;
     return PopupMenuButton(
@@ -33,7 +34,17 @@ class _PopUpOptionsState extends State<PopUpOptions> {
                   value: buses,
                   title: const Text('Paradas de buses'),
                   activeColor: colorProvider.appColor,
-                  onChanged: (value) => setState(() => buses = value!),
+                  onChanged: (_) {
+                    busProvider.isActive = !busProvider.isActive;
+
+                    if (busProvider.isActive) {
+                      busProvider.getBusStops();
+                    } else {
+                      busProvider.clearBusStops();
+                    }
+
+                    setState(() => buses = busProvider.isActive);
+                  },
                 );
               },
             ),
