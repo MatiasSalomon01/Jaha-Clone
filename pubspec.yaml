@@ -23,3 +23,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/jaha-logo.png
+    - assets/bus-stop.png
+    - lib/data/bus-stops.json
