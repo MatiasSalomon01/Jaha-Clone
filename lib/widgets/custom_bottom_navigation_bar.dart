@@ -57,6 +57,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
             // case 1:
             //   _showOptionsDialog(context);
             //   break;
+            case 2:
+              Navigator.pushNamed(context, Routes.LOCATION);
+              break;
             case 3:
               Navigator.pushNamed(context, Routes.CARD);
               break;

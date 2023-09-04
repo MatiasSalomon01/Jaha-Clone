@@ -10,6 +10,8 @@ class Routes {
   static String CARD = 'card';
   // ignore: non_constant_identifier_names
   static String PERSON = 'person';
+  // ignore: non_constant_identifier_names
+  static String LOCATION = 'location';
 
   static Map<String, Widget Function(BuildContext)> buildRoutes(
       BuildContext context) {
@@ -18,6 +20,7 @@ class Routes {
       BUSES: (context) => const BusesScreen(),
       CARD: (context) => const CardScreen(),
       PERSON: (context) => const PersonScreen(),
+      LOCATION: (context) => const FindLocationScreen(),
     };
   }
 }

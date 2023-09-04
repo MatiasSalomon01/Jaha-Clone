@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+const black = Colors.black;
 const grey = Colors.grey;
 const white = Colors.white;
 const transparent = Colors.transparent;
