@@ -17,9 +17,10 @@ class _PopUpOptionsState extends State<PopUpOptions> {
   Widget build(BuildContext context) {
     final colorProvider = Provider.of<ColorProvider>(context);
     final busProvider = Provider.of<BusProvider>(context);
-    bool buses = false;
-    bool ventas = false;
+    bool buses = busProvider.isActive;
+    bool ventas = colorProvider.isActive;
     return PopupMenuButton(
+      splashRadius: 40,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       padding: EdgeInsets.zero,
       offset: const Offset(30, 0),
@@ -57,7 +58,10 @@ class _PopUpOptionsState extends State<PopUpOptions> {
                   title: const Text('Puntos de ventas'),
                   activeColor: colorProvider.appColor,
                   value: ventas,
-                  onChanged: (value) => setState(() => ventas = value!),
+                  onChanged: (_) {
+                    colorProvider.isActive = !colorProvider.isActive;
+                    setState(() => ventas = colorProvider.isActive);
+                  },
                 );
               },
             ),
