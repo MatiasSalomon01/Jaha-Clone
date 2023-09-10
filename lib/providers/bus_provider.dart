@@ -10,8 +10,12 @@ import 'dart:ui' as ui;
 class BusProvider extends ChangeNotifier {
   late final String _jsonString;
 
-  final Map<MarkerId, Marker> _busStops = {};
+  Map<MarkerId, Marker> _busStops = {};
   Set<Marker> get busStops => _busStops.values.toSet();
+  Map<MarkerId, Marker> get busStopsMap => _busStops;
+
+  Map<MarkerId, Marker> _markers = {};
+  Set<Marker> get markers => _markers.values.toSet();
 
   final CameraPosition initialPosition = const CameraPosition(
     target: LatLng(-25.263978, -57.576177),
@@ -31,9 +35,9 @@ class BusProvider extends ChangeNotifier {
   }
 
   Future<void> getBusStops() async {
+    print('asdasdasdsa');
     final List<dynamic> data = json.decode(_jsonString);
 
-    int count = 0;
     for (var i in data) {
       final Map<String, dynamic> coordenates = i;
 
@@ -42,19 +46,28 @@ class BusProvider extends ChangeNotifier {
         coordenates['longitude'],
       );
 
-      final id = count.toString();
+      final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
       final icon = await _busStopIcon.future;
       final marker = Marker(markerId: marketId, position: position, icon: icon);
 
       _busStops[marketId] = marker;
-      count++;
     }
     notifyListeners();
   }
 
   void clearBusStops() {
     _busStops.clear();
+    notifyListeners();
+  }
+
+  void clearMarkers(Map<MarkerId, Marker> markers) {
+    for (var element in markers.entries) {
+      if (_markers.containsKey(element.key)) {
+        _markers.removeWhere(
+            (key, value) => key == element.key && value == element.value);
+      }
+    }
     notifyListeners();
   }
 
@@ -69,5 +82,22 @@ class BusProvider extends ChangeNotifier {
     final newByteData =
         await frame.image.toByteData(format: ui.ImageByteFormat.png);
     return newByteData!.buffer.asUint8List();
+  }
+
+  void addRange(Map<MarkerId, Marker> markers) {
+    // var tempMap = <MarkerId, Marker>{};
+    for (var element in markers.entries) {
+      // tempMap[element.key] = element.value;
+      _markers.putIfAbsent(element.key, () => element.value);
+      notifyListeners();
+    }
+    // if (_markers.isNotEmpty) {
+    //   print('Total antes de insertar: ${_markers.length}');
+    //   _markers.addAll(tempMap);
+    //   print('Total despues de insertar: ${_markers.length}');
+    //   notifyListeners();
+    //   return;
+    // }
+    // _markers = tempMap;
   }
 }
