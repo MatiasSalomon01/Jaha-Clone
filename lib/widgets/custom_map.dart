@@ -9,10 +9,12 @@ class CustomMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final busProvider = Provider.of<BusProvider>(context);
+    final salePointsProvider = Provider.of<SalePointsProvider>(context);
     return GoogleMap(
       zoomControlsEnabled: false,
       initialCameraPosition: busProvider.initialPosition,
-      markers: busProvider.busStops,
+      markers: busProvider.markers,
+      // markers: {...busProvider.busStops, ...salePointsProvider.salePoints},
     );
   }
 }

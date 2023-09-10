@@ -19,7 +19,8 @@ class AppState extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => ColorProvider(appColor: color),
         ),
-        ChangeNotifierProvider(create: (context) => BusProvider())
+        ChangeNotifierProvider(create: (context) => BusProvider()),
+        ChangeNotifierProvider(create: (context) => SalePointsProvider())
       ],
       child: const MainApp(),
     );

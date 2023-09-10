@@ -17,8 +17,9 @@ class _PopUpOptionsState extends State<PopUpOptions> {
   Widget build(BuildContext context) {
     final colorProvider = Provider.of<ColorProvider>(context);
     final busProvider = Provider.of<BusProvider>(context);
+    final salePointsProvider = Provider.of<SalePointsProvider>(context);
     bool buses = busProvider.isActive;
-    bool ventas = colorProvider.isActive;
+    bool ventas = salePointsProvider.isActive;
     return PopupMenuButton(
       splashRadius: 40,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -35,15 +36,17 @@ class _PopUpOptionsState extends State<PopUpOptions> {
                   value: buses,
                   title: const Text('Paradas de buses'),
                   activeColor: colorProvider.appColor,
-                  onChanged: (_) {
+                  onChanged: (_) async {
                     busProvider.isActive = !busProvider.isActive;
 
                     if (busProvider.isActive) {
-                      busProvider.getBusStops();
+                      if (busProvider.busStops.isEmpty) {
+                        await busProvider.getBusStops();
+                      }
+                      busProvider.addRange(busProvider.busStopsMap);
                     } else {
-                      busProvider.clearBusStops();
+                      busProvider.clearMarkers(busProvider.busStopsMap);
                     }
-
                     setState(() => buses = busProvider.isActive);
                   },
                 );
@@ -58,9 +61,19 @@ class _PopUpOptionsState extends State<PopUpOptions> {
                   title: const Text('Puntos de ventas'),
                   activeColor: colorProvider.appColor,
                   value: ventas,
-                  onChanged: (_) {
-                    colorProvider.isActive = !colorProvider.isActive;
-                    setState(() => ventas = colorProvider.isActive);
+                  onChanged: (_) async {
+                    salePointsProvider.isActive = !salePointsProvider.isActive;
+
+                    if (salePointsProvider.isActive) {
+                      if (salePointsProvider.salePoints.isEmpty) {
+                        await salePointsProvider.getSalePoints();
+                      }
+                      busProvider.addRange(salePointsProvider.salePointsMap);
+                    } else {
+                      busProvider
+                          .clearMarkers(salePointsProvider.salePointsMap);
+                    }
+                    setState(() => ventas = salePointsProvider.isActive);
                   },
                 );
               },

@@ -24,4 +24,6 @@ flutter:
   assets:
     - assets/jaha-logo.png
     - assets/bus-stop.png
+    - assets/sale-point.png
     - lib/data/bus-stops.json
+    - lib/data/sale-points.json
