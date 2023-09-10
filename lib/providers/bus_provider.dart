@@ -35,7 +35,6 @@ class BusProvider extends ChangeNotifier {
   }
 
   Future<void> getBusStops() async {
-    print('asdasdasdsa');
     final List<dynamic> data = json.decode(_jsonString);
 
     for (var i in data) {
@@ -85,19 +84,9 @@ class BusProvider extends ChangeNotifier {
   }
 
   void addRange(Map<MarkerId, Marker> markers) {
-    // var tempMap = <MarkerId, Marker>{};
     for (var element in markers.entries) {
-      // tempMap[element.key] = element.value;
       _markers.putIfAbsent(element.key, () => element.value);
-      notifyListeners();
     }
-    // if (_markers.isNotEmpty) {
-    //   print('Total antes de insertar: ${_markers.length}');
-    //   _markers.addAll(tempMap);
-    //   print('Total despues de insertar: ${_markers.length}');
-    //   notifyListeners();
-    //   return;
-    // }
-    // _markers = tempMap;
+    notifyListeners();
   }
 }
