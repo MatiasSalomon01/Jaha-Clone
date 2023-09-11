@@ -36,6 +36,7 @@ class BusProvider extends ChangeNotifier {
 
   Future<void> getBusStops() async {
     final List<dynamic> data = json.decode(_jsonString);
+    final icon = await _busStopIcon.future;
 
     for (var i in data) {
       final Map<String, dynamic> coordenates = i;
@@ -47,7 +48,6 @@ class BusProvider extends ChangeNotifier {
 
       final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
-      final icon = await _busStopIcon.future;
       final marker = Marker(markerId: marketId, position: position, icon: icon);
 
       _busStops[marketId] = marker;
