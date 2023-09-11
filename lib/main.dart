@@ -2,9 +2,14 @@ import 'package:ans_map_project/colors/colors.dart';
 import 'package:ans_map_project/providers/providers.dart';
 import 'package:ans_map_project/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+import 'services/services.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Location.getUserPosition();
   runApp(const AppState());
 }
 

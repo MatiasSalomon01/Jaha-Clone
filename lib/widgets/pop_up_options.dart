@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../providers/providers.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../services/services.dart';
+
 class PopUpOptions extends StatefulWidget {
   const PopUpOptions({
     super.key,
@@ -39,6 +41,7 @@ class _PopUpOptionsState extends State<PopUpOptions> {
                   title: const Text('Paradas de buses'),
                   activeColor: colorProvider.appColor,
                   onChanged: (_) async {
+                    print(Location.position);
                     busProvider.isActive = !busProvider.isActive;
 
                     if (busProvider.isActive) {
