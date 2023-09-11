@@ -1,3 +1,4 @@
+export 'package:ans_map_project/screens/splash_screen.dart';
 export 'package:ans_map_project/screens/find_location_screen.dart';
 export 'package:ans_map_project/screens/person_screen.dart';
 export 'package:ans_map_project/screens/card_screen.dart';
