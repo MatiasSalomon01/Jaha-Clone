@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import '../services/services.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -26,6 +26,7 @@ class BusProvider extends ChangeNotifier {
   final _busStopIcon = Completer<BitmapDescriptor>();
 
   bool isActive = false;
+  bool nearYou = true;
 
   BusProvider() {
     loadJsonData();
@@ -84,10 +85,30 @@ class BusProvider extends ChangeNotifier {
     return newByteData!.buffer.asUint8List();
   }
 
-  void addRange(Map<MarkerId, Marker> markers) {
+  void setMarkers(Map<MarkerId, Marker> markers) {
     for (var element in markers.entries) {
       _markers.putIfAbsent(element.key, () => element.value);
     }
     notifyListeners();
+  }
+
+  setNearMarkers(Set<Marker> markers) {
+    Map<MarkerId, Marker> filteredMarkers = {};
+    const double maxDistance = 1000.0;
+
+    for (var marker in markers) {
+      double distance = Location.calculateDistance(
+        Location.position.latitude,
+        Location.position.longitude,
+        marker.position.latitude,
+        marker.position.longitude,
+      );
+
+      if (distance <= maxDistance) {
+        filteredMarkers[marker.markerId] = marker;
+      }
+
+      setMarkers(filteredMarkers);
+    }
   }
 }
