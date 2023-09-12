@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import '../services/services.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -18,13 +20,24 @@ class BusProvider extends ChangeNotifier {
   Set<Marker> get markers => _markers.values.toSet();
 
   final CameraPosition initialPosition = const CameraPosition(
-    target: LatLng(-25.263978, -57.576177),
+    target: LatLng(
+      -25.2863,
+      -57.6118,
+    ),
     zoom: 14,
   );
 
   final _busStopIcon = Completer<BitmapDescriptor>();
 
   bool isActive = false;
+  bool nearYou = true;
+
+  bool showCurrentLocation = false;
+
+  Map<MarkerId, Marker> _userPosition = {};
+  Position position = Location.position;
+
+  late GoogleMapController controller;
 
   BusProvider() {
     loadJsonData();
@@ -36,6 +49,7 @@ class BusProvider extends ChangeNotifier {
 
   Future<void> getBusStops() async {
     final List<dynamic> data = json.decode(_jsonString);
+    final icon = await _busStopIcon.future;
 
     for (var i in data) {
       final Map<String, dynamic> coordenates = i;
@@ -47,7 +61,6 @@ class BusProvider extends ChangeNotifier {
 
       final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
-      final icon = await _busStopIcon.future;
       final marker = Marker(markerId: marketId, position: position, icon: icon);
 
       _busStops[marketId] = marker;
@@ -83,10 +96,57 @@ class BusProvider extends ChangeNotifier {
     return newByteData!.buffer.asUint8List();
   }
 
-  void addRange(Map<MarkerId, Marker> markers) {
+  void setMarkers(Map<MarkerId, Marker> markers) {
     for (var element in markers.entries) {
       _markers.putIfAbsent(element.key, () => element.value);
     }
     notifyListeners();
+  }
+
+  setNearMarkers(Set<Marker> markers) {
+    Map<MarkerId, Marker> filteredMarkers = {};
+    const double maxDistance = 1000.0;
+
+    for (var marker in markers) {
+      double distance = Location.calculateDistance(
+        position.latitude,
+        position.longitude,
+        marker.position.latitude,
+        marker.position.longitude,
+      );
+
+      if (distance <= maxDistance) {
+        filteredMarkers[marker.markerId] = marker;
+      }
+
+      setMarkers(filteredMarkers);
+    }
+  }
+
+  setCurrentLocationOnMap() {
+    if (showCurrentLocation == false) {
+      final id = DateTime.now().microsecondsSinceEpoch.toString();
+      final marketId = MarkerId(id);
+      final marker = Marker(
+        markerId: marketId,
+        position: LatLng(
+          position.latitude,
+          position.longitude,
+        ),
+      );
+      _userPosition[marketId] = marker;
+
+      controller.animateCamera(
+        CameraUpdate.newLatLng(
+          LatLng(position.latitude, position.longitude),
+        ),
+      );
+
+      setMarkers(_userPosition);
+    }
+    if (showCurrentLocation == true) {
+      clearMarkers(_userPosition);
+    }
+    showCurrentLocation = !showCurrentLocation;
   }
 }
