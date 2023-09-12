@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../colors/colors.dart';
-import '../providers/color_provider.dart';
+import '../providers/providers.dart';
 
 class CustomFloatingActionButtom extends StatelessWidget {
   const CustomFloatingActionButtom({super.key});
@@ -16,7 +16,10 @@ class CustomFloatingActionButtom extends StatelessWidget {
         backgroundColor: colorProvider.appColor,
         highlightElevation: 1,
         elevation: 0,
-        onPressed: () {},
+        onPressed: () {
+          final busProvider = Provider.of<BusProvider>(context, listen: false);
+          busProvider.setCurrentLocationOnMap();
+        },
         child: const Icon(Icons.my_location),
       ),
     );

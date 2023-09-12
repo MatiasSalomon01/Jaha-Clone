@@ -32,7 +32,12 @@ class BusProvider extends ChangeNotifier {
   bool isActive = false;
   bool nearYou = true;
 
+  bool showCurrentLocation = false;
+
+  Map<MarkerId, Marker> _userPosition = {};
   Position position = Location.position;
+
+  late GoogleMapController controller;
 
   BusProvider() {
     loadJsonData();
@@ -116,5 +121,32 @@ class BusProvider extends ChangeNotifier {
 
       setMarkers(filteredMarkers);
     }
+  }
+
+  setCurrentLocationOnMap() {
+    if (showCurrentLocation == false) {
+      final id = DateTime.now().microsecondsSinceEpoch.toString();
+      final marketId = MarkerId(id);
+      final marker = Marker(
+        markerId: marketId,
+        position: LatLng(
+          position.latitude,
+          position.longitude,
+        ),
+      );
+      _userPosition[marketId] = marker;
+
+      controller.animateCamera(
+        CameraUpdate.newLatLng(
+          LatLng(position.latitude, position.longitude),
+        ),
+      );
+
+      setMarkers(_userPosition);
+    }
+    if (showCurrentLocation == true) {
+      clearMarkers(_userPosition);
+    }
+    showCurrentLocation = !showCurrentLocation;
   }
 }

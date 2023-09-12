@@ -13,6 +13,9 @@ class CustomMap extends StatelessWidget {
       zoomControlsEnabled: false,
       initialCameraPosition: busProvider.initialPosition,
       markers: busProvider.markers,
+      onMapCreated: (controller) {
+        busProvider.controller = controller;
+      },
     );
   }
 }
