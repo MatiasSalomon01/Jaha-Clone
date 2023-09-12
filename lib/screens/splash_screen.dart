@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (Location.isEnabled) {
-        Navigator.pushNamed(context, Routes.HOME);
+        Navigator.pushReplacementNamed(context, Routes.HOME);
       }
     });
   }

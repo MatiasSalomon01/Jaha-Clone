@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -19,7 +20,10 @@ class BusProvider extends ChangeNotifier {
   Set<Marker> get markers => _markers.values.toSet();
 
   final CameraPosition initialPosition = const CameraPosition(
-    target: LatLng(-25.263978, -57.576177),
+    target: LatLng(
+      -25.2863,
+      -57.6118,
+    ),
     zoom: 14,
   );
 
@@ -27,6 +31,8 @@ class BusProvider extends ChangeNotifier {
 
   bool isActive = false;
   bool nearYou = true;
+
+  Position position = Location.position;
 
   BusProvider() {
     loadJsonData();
@@ -98,8 +104,8 @@ class BusProvider extends ChangeNotifier {
 
     for (var marker in markers) {
       double distance = Location.calculateDistance(
-        Location.position.latitude,
-        Location.position.longitude,
+        position.latitude,
+        position.longitude,
         marker.position.latitude,
         marker.position.longitude,
       );

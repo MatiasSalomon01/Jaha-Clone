@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/providers.dart';
 
-import '../services/services.dart';
-
 class PopUpOptions extends StatefulWidget {
   const PopUpOptions({
     super.key,
