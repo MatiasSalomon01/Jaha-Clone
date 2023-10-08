@@ -27,10 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           PopupMenuButton(
             splashRadius: 40,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
             padding: EdgeInsets.zero,
-            offset: const Offset(0, 50),
+            offset: const Offset(0, 45),
             tooltip: '',
             child: const Padding(
               padding: EdgeInsets.only(right: 10),
@@ -41,9 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             itemBuilder: (context) {
               return [
-                // PopupMenuItem(
-                //   child: Text('hola xd'),
-                // )
                 PopupMenuItem(
                   padding: EdgeInsets.zero,
                   child: StatefulBuilder(
@@ -59,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         activeColor: colorProvider.appColor,
                         onChanged: (_) async {
-                          // busProvider.nearYou = !busProvider.nearYou;
                           setState(() => favorite = !favorite);
                         },
                       );
@@ -68,14 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ];
             },
-            // child: IconButton(
-            //   onPressed: () {},
-            //   splashRadius: 20,
-            //   icon: const Icon(
-            //     Icons.favorite,
-            //     // color: Colors.red,
-            //   ),
-            // ),
           )
         ],
       ),
