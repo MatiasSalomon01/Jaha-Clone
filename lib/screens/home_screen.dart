@@ -3,9 +3,15 @@ import 'package:provider/provider.dart';
 import '../providers/color_provider.dart';
 import '../widgets/widgets.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool favorite = false;
   @override
   Widget build(BuildContext context) {
     final colorProvider = Provider.of<ColorProvider>(context);
@@ -18,6 +24,60 @@ class HomeScreen extends StatelessWidget {
           'assets/jaha-logo.png',
           height: 55,
         ),
+        actions: [
+          PopupMenuButton(
+            splashRadius: 40,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            padding: EdgeInsets.zero,
+            offset: const Offset(0, 50),
+            tooltip: '',
+            child: const Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.favorite,
+                // color: Colors.red,
+              ),
+            ),
+            itemBuilder: (context) {
+              return [
+                // PopupMenuItem(
+                //   child: Text('hola xd'),
+                // )
+                PopupMenuItem(
+                  padding: EdgeInsets.zero,
+                  child: StatefulBuilder(
+                    builder: (context, setState) {
+                      return CheckboxListTile(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 15),
+                        value: favorite,
+                        title: const Text(
+                          'Paradas favoritas',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        activeColor: colorProvider.appColor,
+                        onChanged: (_) async {
+                          // busProvider.nearYou = !busProvider.nearYou;
+                          setState(() => favorite = !favorite);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ];
+            },
+            // child: IconButton(
+            //   onPressed: () {},
+            //   splashRadius: 20,
+            //   icon: const Icon(
+            //     Icons.favorite,
+            //     // color: Colors.red,
+            //   ),
+            // ),
+          )
+        ],
       ),
       body: const CustomMap(),
       floatingActionButton: const CustomFloatingActionButtom(),

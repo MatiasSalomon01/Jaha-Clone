@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:custom_info_window/custom_info_window.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,16 @@ class BusProvider extends ChangeNotifier {
 
   Map<MarkerId, Marker> _markers = {};
   Set<Marker> get markers => _markers.values.toSet();
+
+  CustomInfoWindowController _customInfoWindowController =
+      CustomInfoWindowController();
+
+  CustomInfoWindowController get customInfoWindowController =>
+      _customInfoWindowController;
+
+  set customInfoWindowController(CustomInfoWindowController value) {
+    _customInfoWindowController = value;
+  }
 
   final CameraPosition initialPosition = const CameraPosition(
     target: LatLng(
@@ -61,7 +72,36 @@ class BusProvider extends ChangeNotifier {
 
       final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
-      final marker = Marker(markerId: marketId, position: position, icon: icon);
+      final marker = Marker(
+        markerId: marketId,
+        position: position,
+        icon: icon,
+        onTap: () {
+          _customInfoWindowController.addInfoWindow!(
+            Container(
+                // width: 50,
+                // height: 50,
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.green),
+                    borderRadius: BorderRadius.circular(10)),
+                child: ListView(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Línea 23'),
+                        Text('Línea 30 azul'),
+                        Text('Línea 30 amarillo'),
+                      ],
+                    ),
+                  ],
+                )),
+            position,
+          );
+        },
+      );
 
       _busStops[marketId] = marker;
     }
@@ -148,5 +188,9 @@ class BusProvider extends ChangeNotifier {
       clearMarkers(_userPosition);
     }
     showCurrentLocation = !showCurrentLocation;
+  }
+
+  disposeInfoController() {
+    _customInfoWindowController.dispose();
   }
 }
