@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:custom_info_window/custom_info_window.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
@@ -19,18 +20,34 @@ class BusProvider extends ChangeNotifier {
   Map<MarkerId, Marker> _markers = {};
   Set<Marker> get markers => _markers.values.toSet();
 
-  final CameraPosition initialPosition = const CameraPosition(
-    target: LatLng(
-      -25.2863,
-      -57.6118,
-    ),
-    zoom: 14,
-  );
+  CustomInfoWindowController _customInfoWindowController =
+      CustomInfoWindowController();
+
+  CustomInfoWindowController get customInfoWindowController =>
+      _customInfoWindowController;
+
+  set customInfoWindowController(CustomInfoWindowController value) {
+    _customInfoWindowController = value;
+  }
+
+  CameraPosition initialPosition() {
+    return CameraPosition(
+      target: LatLng(position.latitude, position.longitude),
+      zoom: 14,
+    );
+  }
 
   final _busStopIcon = Completer<BitmapDescriptor>();
 
   bool isActive = false;
-  bool nearYou = true;
+  bool _nearYou = true;
+
+  bool get nearYou => _nearYou;
+
+  set nearYou(bool value) {
+    _nearYou = value;
+    notifyListeners();
+  }
 
   bool showCurrentLocation = false;
 
@@ -38,6 +55,15 @@ class BusProvider extends ChangeNotifier {
   Position position = Location.position;
 
   late GoogleMapController controller;
+
+  double _distanceNearYou = 1000;
+
+  double get distanceNearYou => _distanceNearYou;
+
+  set distanceNearYou(double value) {
+    _distanceNearYou = value;
+    notifyListeners();
+  }
 
   BusProvider() {
     loadJsonData();
@@ -61,7 +87,36 @@ class BusProvider extends ChangeNotifier {
 
       final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
-      final marker = Marker(markerId: marketId, position: position, icon: icon);
+      final marker = Marker(
+        markerId: marketId,
+        position: position,
+        icon: icon,
+        onTap: () {
+          _customInfoWindowController.addInfoWindow!(
+            Container(
+                // width: 50,
+                // height: 50,
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.green),
+                    borderRadius: BorderRadius.circular(10)),
+                child: ListView(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Línea 23'),
+                        Text('Línea 30 azul'),
+                        Text('Línea 30 amarillo'),
+                      ],
+                    ),
+                  ],
+                )),
+            position,
+          );
+        },
+      );
 
       _busStops[marketId] = marker;
     }
@@ -105,7 +160,7 @@ class BusProvider extends ChangeNotifier {
 
   setNearMarkers(Set<Marker> markers) {
     Map<MarkerId, Marker> filteredMarkers = {};
-    const double maxDistance = 1000.0;
+    double maxDistance = _distanceNearYou;
 
     for (var marker in markers) {
       double distance = Location.calculateDistance(
@@ -148,5 +203,22 @@ class BusProvider extends ChangeNotifier {
       clearMarkers(_userPosition);
     }
     showCurrentLocation = !showCurrentLocation;
+  }
+
+  disposeInfoController() {
+    _customInfoWindowController.dispose();
+  }
+
+  Set<Circle> buildCircle(Color fillColor) {
+    return {
+      Circle(
+        circleId: const CircleId('d7d02a51-a69a-4fed-b7da-47b011f7f59e'),
+        center: LatLng(position.latitude, position.longitude),
+        radius: _distanceNearYou,
+        strokeWidth: 2,
+        fillColor: fillColor.withOpacity(.15),
+        strokeColor: fillColor,
+      ),
+    };
   }
 }
