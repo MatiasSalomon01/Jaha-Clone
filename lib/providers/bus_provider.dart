@@ -40,7 +40,14 @@ class BusProvider extends ChangeNotifier {
   final _busStopIcon = Completer<BitmapDescriptor>();
 
   bool isActive = false;
-  bool nearYou = true;
+  bool _nearYou = true;
+
+  bool get nearYou => _nearYou;
+
+  set nearYou(bool value) {
+    _nearYou = value;
+    notifyListeners();
+  }
 
   bool showCurrentLocation = false;
 
@@ -48,6 +55,15 @@ class BusProvider extends ChangeNotifier {
   Position position = Location.position;
 
   late GoogleMapController controller;
+
+  double _distanceNearYou = 1000;
+
+  double get distanceNearYou => _distanceNearYou;
+
+  set distanceNearYou(double value) {
+    _distanceNearYou = value;
+    notifyListeners();
+  }
 
   BusProvider() {
     loadJsonData();
@@ -144,7 +160,7 @@ class BusProvider extends ChangeNotifier {
 
   setNearMarkers(Set<Marker> markers) {
     Map<MarkerId, Marker> filteredMarkers = {};
-    const double maxDistance = 1000.0;
+    double maxDistance = _distanceNearYou;
 
     for (var marker in markers) {
       double distance = Location.calculateDistance(
@@ -198,7 +214,7 @@ class BusProvider extends ChangeNotifier {
       Circle(
         circleId: const CircleId('d7d02a51-a69a-4fed-b7da-47b011f7f59e'),
         center: LatLng(position.latitude, position.longitude),
-        radius: 1000,
+        radius: _distanceNearYou,
         strokeWidth: 2,
         fillColor: fillColor.withOpacity(.15),
         strokeColor: fillColor,

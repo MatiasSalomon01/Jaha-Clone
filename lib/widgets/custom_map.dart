@@ -37,7 +37,9 @@ class _CustomMapState extends State<CustomMap> {
               busProvider.customInfoWindowController.hideInfoWindow!(),
           onCameraMove: (position) =>
               busProvider.customInfoWindowController.hideInfoWindow!(),
-          circles: busProvider.buildCircle(colorProvider.appColor),
+          circles: busProvider.nearYou
+              ? busProvider.buildCircle(colorProvider.appColor)
+              : {},
         ),
         CustomInfoWindow(
           controller: busProvider.customInfoWindowController,
