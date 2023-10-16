@@ -21,18 +21,23 @@ class _CustomMapState extends State<CustomMap> {
   @override
   Widget build(BuildContext context) {
     final busProvider = Provider.of<BusProvider>(context);
+    final colorProvider = Provider.of<ColorProvider>(context);
     return Stack(
       children: [
         GoogleMap(
           zoomControlsEnabled: false,
-          initialCameraPosition: busProvider.initialPosition,
+          initialCameraPosition: busProvider.initialPosition(),
           markers: busProvider.markers,
-          onMapCreated: (controller) => busProvider
-              .customInfoWindowController.googleMapController = controller,
+          onMapCreated: (controller) {
+            busProvider.customInfoWindowController.googleMapController =
+                controller;
+            busProvider.controller = controller;
+          },
           onTap: (argument) =>
               busProvider.customInfoWindowController.hideInfoWindow!(),
           onCameraMove: (position) =>
               busProvider.customInfoWindowController.hideInfoWindow!(),
+          circles: busProvider.buildCircle(colorProvider.appColor),
         ),
         CustomInfoWindow(
           controller: busProvider.customInfoWindowController,

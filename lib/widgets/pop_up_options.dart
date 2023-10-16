@@ -33,19 +33,43 @@ class _PopUpOptionsState extends State<PopUpOptions> {
             padding: EdgeInsets.zero,
             child: StatefulBuilder(
               builder: (context, setState) {
-                return CheckboxListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-                  value: nearYou,
-                  title: const Text(
-                    'Cercanos a ti',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                return Theme(
+                  data: ThemeData(
+                    checkboxTheme: CheckboxThemeData(
+                      fillColor:
+                          MaterialStateProperty.all(colorProvider.appColor),
+                      overlayColor: MaterialStateProperty.all(Colors.purple),
+                      splashRadius: 10,
+                      side: const BorderSide(color: Colors.black54, width: 2),
+                    ),
                   ),
-                  activeColor: colorProvider.appColor,
-                  onChanged: (_) async {
-                    busProvider.nearYou = !busProvider.nearYou;
-                    setState(() => nearYou = busProvider.nearYou);
-                  },
+                  child: CheckboxMenuButton(
+                    style: ButtonStyle(
+                      splashFactory: NoSplash.splashFactory,
+                      overlayColor:
+                          MaterialStateProperty.all(Colors.transparent),
+                    ),
+                    trailingIcon: MaterialButton(
+                      minWidth: 0,
+                      padding: const EdgeInsets.all(8),
+                      onPressed: () {},
+                      highlightColor: Colors.black12,
+                      shape: const CircleBorder(),
+                      child: const Icon(Icons.more_vert),
+                    ),
+                    value: nearYou,
+                    onChanged: (_) {
+                      busProvider.nearYou = !busProvider.nearYou;
+                      setState(() => nearYou = busProvider.nearYou);
+                    },
+                    child: const Text(
+                      'Cercanos a ti',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 16),
+                    ),
+                  ),
                 );
               },
             ),

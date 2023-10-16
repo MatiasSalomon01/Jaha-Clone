@@ -30,13 +30,12 @@ class BusProvider extends ChangeNotifier {
     _customInfoWindowController = value;
   }
 
-  final CameraPosition initialPosition = const CameraPosition(
-    target: LatLng(
-      -25.2863,
-      -57.6118,
-    ),
-    zoom: 14,
-  );
+  CameraPosition initialPosition() {
+    return CameraPosition(
+      target: LatLng(position.latitude, position.longitude),
+      zoom: 14,
+    );
+  }
 
   final _busStopIcon = Completer<BitmapDescriptor>();
 
@@ -192,5 +191,18 @@ class BusProvider extends ChangeNotifier {
 
   disposeInfoController() {
     _customInfoWindowController.dispose();
+  }
+
+  Set<Circle> buildCircle(Color fillColor) {
+    return {
+      Circle(
+        circleId: const CircleId('d7d02a51-a69a-4fed-b7da-47b011f7f59e'),
+        center: LatLng(position.latitude, position.longitude),
+        radius: 1000,
+        strokeWidth: 2,
+        fillColor: fillColor.withOpacity(.15),
+        strokeColor: fillColor,
+      ),
+    };
   }
 }
