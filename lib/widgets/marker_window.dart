@@ -15,7 +15,7 @@ class MarkerWindow extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Container(
-        padding: EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.only(bottom: 10),
         child: ListView(
           children: [
             Column(

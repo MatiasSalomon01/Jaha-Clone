@@ -53,8 +53,10 @@ class BusProvider extends ChangeNotifier {
 
   bool showCurrentLocation = false;
 
-  Map<MarkerId, Marker> _userPosition = {};
+  Map<MarkerId, Marker> userPosition = {};
   Position position = Location.position;
+
+  Map<MarkerId, Marker> momentaryMarker = {};
 
   late GoogleMapController controller;
 
@@ -163,6 +165,7 @@ class BusProvider extends ChangeNotifier {
 
   setCurrentLocationOnMap() {
     if (showCurrentLocation == false) {
+      clearMarkers(momentaryMarker);
       final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
       final marker = Marker(
@@ -172,20 +175,21 @@ class BusProvider extends ChangeNotifier {
           position.longitude,
         ),
       );
-      _userPosition[marketId] = marker;
+      userPosition[marketId] = marker;
 
       controller.animateCamera(
         CameraUpdate.newLatLng(
           LatLng(position.latitude, position.longitude),
         ),
       );
-
-      setMarkers(_userPosition);
+      print("AAAAAA: $momentaryMarker");
+      setMarkers(userPosition);
     }
     if (showCurrentLocation == true) {
-      clearMarkers(_userPosition);
+      clearMarkers(userPosition);
     }
     showCurrentLocation = !showCurrentLocation;
+    clearMarkers(momentaryMarker);
   }
 
   disposeInfoController() {
@@ -196,12 +200,31 @@ class BusProvider extends ChangeNotifier {
     return {
       Circle(
         circleId: const CircleId('d7d02a51-a69a-4fed-b7da-47b011f7f59e'),
-        center: LatLng(position.latitude, position.longitude),
+        // center: LatLng(position.latitude, position.longitude),
+        center: momentaryMarker.values.first.position,
         radius: _distanceNearYou,
         strokeWidth: 2,
         fillColor: fillColor.withOpacity(.15),
         strokeColor: fillColor,
       ),
     };
+  }
+
+  void putMarker(LatLng position) {
+    if (showCurrentLocation == true) {
+      clearMarkers(userPosition);
+    }
+    showCurrentLocation = false;
+    clearMarkers(momentaryMarker);
+
+    var markerId = MarkerId(DateTime.now().microsecondsSinceEpoch.toString());
+    var marker = Marker(markerId: markerId, position: position);
+
+    momentaryMarker = {
+      markerId: marker,
+    };
+
+    setMarkers(momentaryMarker);
+    // notifyListeners();
   }
 }
