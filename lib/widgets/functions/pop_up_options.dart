@@ -151,31 +151,37 @@ void modalNearYou(
     useSafeArea: true,
     builder: (context) {
       return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Container(
           color: white,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [CustomSlider()],
+            children: const [
+              CustomSlider(),
+            ],
           ),
         ),
         actions: [
-          TextButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(
-                Colors.grey.withOpacity(.1),
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: TextButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.grey.withOpacity(.1),
+                ),
+                overlayColor: MaterialStateProperty.all(
+                  Colors.grey.withOpacity(.4),
+                ),
+                splashFactory: NoSplash.splashFactory,
               ),
-              overlayColor: MaterialStateProperty.all(
-                Colors.grey.withOpacity(.4),
-              ),
-              splashFactory: NoSplash.splashFactory,
-            ),
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Ok',
-              style: TextStyle(
-                fontSize: 16,
-                color: black,
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Ok',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: black,
+                ),
               ),
             ),
           ),
