@@ -45,7 +45,7 @@ class _CustomMapState extends State<CustomMap> {
           controller: busProvider.customInfoWindowController,
           height: 75,
           width: 150,
-          offset: 70,
+          offset: 60,
         )
       ],
     );
