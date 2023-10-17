@@ -40,7 +40,7 @@ class BusProvider extends ChangeNotifier {
   final _busStopIcon = Completer<BitmapDescriptor>();
 
   bool isActive = false;
-  bool _nearYou = true;
+  bool _nearYou = false;
 
   bool get nearYou => _nearYou;
 
