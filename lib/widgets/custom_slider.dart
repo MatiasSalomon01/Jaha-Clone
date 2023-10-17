@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -48,10 +50,20 @@ class _CustomSliderState extends State<CustomSlider> {
               activeColor: colorProvider.appColor,
               value: valor,
               max: 5000,
-              onChanged: (value) {
+              onChanged: (value) async {
                 setState(() {
                   valor = value;
                 });
+
+                if (value < busProvider.distanceNearYou) {
+                  // busProvider.clearMarkers(busProvider.busStopsMap);
+                  await busProvider.clearNearMarkers(busProvider.busStops);
+                  print('aaaaaaaaaaaaaaaaaaaaaaaa');
+                } else {
+                  busProvider.setNearMarkers(busProvider.busStops);
+                  print('yyyyyyyyyyyyyyyyyyyyyyyyy');
+                }
+
                 busProvider.distanceNearYou = value;
               },
             ),
