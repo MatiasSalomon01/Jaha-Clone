@@ -3,15 +3,30 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../colors/colors.dart';
+import '../providers/bus_provider.dart';
 import '../providers/color_provider.dart';
+import '../providers/sale_points_provider.dart';
+import 'functions/pop_up_options.dart';
 import 'widgets.dart';
 
-class CustomBottomNavigationBar extends StatelessWidget {
+class CustomBottomNavigationBar extends StatefulWidget {
   const CustomBottomNavigationBar({super.key});
 
   @override
+  State<CustomBottomNavigationBar> createState() =>
+      _CustomBottomNavigationBarState();
+}
+
+class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
+  @override
   Widget build(BuildContext context) {
     final colorProvider = Provider.of<ColorProvider>(context);
+    final size = MediaQuery.of(context).size;
+    final busProvider = Provider.of<BusProvider>(context);
+    final salePointsProvider = Provider.of<SalePointsProvider>(context);
+    bool buses = busProvider.isActive;
+    bool ventas = salePointsProvider.isActive;
+    bool nearYou = busProvider.nearYou;
     return Theme(
       data: Theme.of(context).copyWith(
         splashColor: transparent,
@@ -33,7 +48,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: PopUpOptions(),
+            icon: Icon(FontAwesomeIcons.store),
             label: '',
           ),
           BottomNavigationBarItem(
@@ -54,9 +69,18 @@ class CustomBottomNavigationBar extends StatelessWidget {
             case 0:
               Navigator.pushNamed(context, Routes.BUSES);
               break;
-            // case 1:
-            //   _showOptionsDialog(context);
-            //   break;
+            case 1:
+              popUpOptions(
+                context,
+                size,
+                colorProvider,
+                nearYou,
+                busProvider,
+                buses,
+                ventas,
+                salePointsProvider,
+              );
+              break;
             case 2:
               Navigator.pushNamed(context, Routes.LOCATION);
               break;
@@ -72,43 +96,4 @@ class CustomBottomNavigationBar extends StatelessWidget {
       ),
     );
   }
-
-  // void _showOptionsDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     barrierColor: transparent,
-  //     builder: (BuildContext context) {
-  //       return Padding(
-  //         padding: const EdgeInsets.only(bottom: 30),
-  //         child: AlertDialog(
-  //           shape:
-  //               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-  //           insetPadding: EdgeInsets.zero,
-  //           contentPadding: EdgeInsets.zero,
-  //           alignment: Alignment.bottomRight,
-  //           content: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               CheckboxListTile(
-  //                 value: true,
-  //                 title: const Text('Paradas de buses'),
-  //                 onChanged: (value) {},
-  //               ),
-  //               CheckboxListTile(
-  //                 value: true,
-  //                 title: const Text('Paradas de buses'),
-  //                 onChanged: (value) {},
-  //               ),
-  //               CheckboxListTile(
-  //                 value: true,
-  //                 title: const Text('Paradas de buses'),
-  //                 onChanged: (value) {},
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }
