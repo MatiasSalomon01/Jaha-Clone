@@ -33,8 +33,10 @@ class _CustomMapState extends State<CustomMap> {
                 controller;
             busProvider.controller = controller;
           },
-          onTap: (argument) =>
-              busProvider.customInfoWindowController.hideInfoWindow!(),
+          onTap: (argument) {
+            busProvider.putMarker(argument);
+            busProvider.customInfoWindowController.hideInfoWindow!();
+          },
           onCameraMove: (position) =>
               busProvider.customInfoWindowController.hideInfoWindow!(),
           circles: busProvider.nearYou
@@ -45,7 +47,7 @@ class _CustomMapState extends State<CustomMap> {
           controller: busProvider.customInfoWindowController,
           height: 75,
           width: 150,
-          offset: 70,
+          offset: 60,
         )
       ],
     );

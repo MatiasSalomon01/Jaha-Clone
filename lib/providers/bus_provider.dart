@@ -10,6 +10,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import '../widgets/marker_window.dart';
+
 class BusProvider extends ChangeNotifier {
   late final String _jsonString;
 
@@ -40,7 +42,7 @@ class BusProvider extends ChangeNotifier {
   final _busStopIcon = Completer<BitmapDescriptor>();
 
   bool isActive = false;
-  bool _nearYou = true;
+  bool _nearYou = false;
 
   bool get nearYou => _nearYou;
 
@@ -51,8 +53,10 @@ class BusProvider extends ChangeNotifier {
 
   bool showCurrentLocation = false;
 
-  Map<MarkerId, Marker> _userPosition = {};
+  Map<MarkerId, Marker> userPosition = {};
   Position position = Location.position;
+
+  Map<MarkerId, Marker> momentaryMarker = {};
 
   late GoogleMapController controller;
 
@@ -93,26 +97,7 @@ class BusProvider extends ChangeNotifier {
         icon: icon,
         onTap: () {
           _customInfoWindowController.addInfoWindow!(
-            Container(
-                // width: 50,
-                // height: 50,
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(10)),
-                child: ListView(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Línea 23'),
-                        Text('Línea 30 azul'),
-                        Text('Línea 30 amarillo'),
-                      ],
-                    ),
-                  ],
-                )),
+            const MarkerWindow(),
             position,
           );
         },
@@ -162,10 +147,16 @@ class BusProvider extends ChangeNotifier {
     Map<MarkerId, Marker> filteredMarkers = {};
     double maxDistance = _distanceNearYou;
 
+    var actualPosition = momentaryMarker.isEmpty
+        ? userPosition.isEmpty
+            ? LatLng(position.latitude, position.longitude)
+            : userPosition.values.first.position
+        : momentaryMarker.values.first.position;
+
     for (var marker in markers) {
       double distance = Location.calculateDistance(
-        position.latitude,
-        position.longitude,
+        actualPosition.latitude,
+        actualPosition.longitude,
         marker.position.latitude,
         marker.position.longitude,
       );
@@ -178,8 +169,45 @@ class BusProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> clearNearMarkers(Set<Marker> markers) async {
+    Map<MarkerId, Marker> filteredMarkers = {};
+    double maxDistance = _distanceNearYou;
+
+    var actualPosition = momentaryMarker.isEmpty
+        ? userPosition.isEmpty
+            ? LatLng(position.latitude, position.longitude)
+            : userPosition.values.first.position
+        : momentaryMarker.values.first.position;
+
+    for (var marker in markers) {
+      double distance = Location.calculateDistance(
+        actualPosition.latitude,
+        actualPosition.longitude,
+        marker.position.latitude,
+        marker.position.longitude,
+      );
+
+      if (distance > maxDistance) {
+        filteredMarkers[marker.markerId] = marker;
+        if (_markers.containsKey(marker.markerId)) {
+          _markers.removeWhere(
+              (key, value) => key == marker.markerId && value == marker);
+        }
+      }
+    }
+
+    // for (var element in filteredMarkers.entries) {
+    //   if (_markers.containsKey(element.key)) {
+    //     _markers.removeWhere(
+    //         (key, value) => key == element.key && value == element.value);
+    //   }
+    // }
+    notifyListeners();
+  }
+
   setCurrentLocationOnMap() {
     if (showCurrentLocation == false) {
+      clearMarkers(momentaryMarker);
       final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
       final marker = Marker(
@@ -189,20 +217,21 @@ class BusProvider extends ChangeNotifier {
           position.longitude,
         ),
       );
-      _userPosition[marketId] = marker;
+      userPosition[marketId] = marker;
 
       controller.animateCamera(
         CameraUpdate.newLatLng(
           LatLng(position.latitude, position.longitude),
         ),
       );
-
-      setMarkers(_userPosition);
+      momentaryMarker = {};
+      setMarkers(userPosition);
     }
     if (showCurrentLocation == true) {
-      clearMarkers(_userPosition);
+      clearMarkers(userPosition);
     }
     showCurrentLocation = !showCurrentLocation;
+    clearMarkers(momentaryMarker);
   }
 
   disposeInfoController() {
@@ -213,12 +242,41 @@ class BusProvider extends ChangeNotifier {
     return {
       Circle(
         circleId: const CircleId('d7d02a51-a69a-4fed-b7da-47b011f7f59e'),
-        center: LatLng(position.latitude, position.longitude),
+        // center: LatLng(position.latitude, position.longitude),
+        center: momentaryMarker.isEmpty
+            ? userPosition.isEmpty
+                ? LatLng(position.latitude, position.longitude)
+                : userPosition.values.first.position
+            : momentaryMarker.values.first.position,
+
         radius: _distanceNearYou,
         strokeWidth: 2,
         fillColor: fillColor.withOpacity(.15),
         strokeColor: fillColor,
       ),
     };
+  }
+
+  void putMarker(LatLng position) {
+    if (showCurrentLocation == true) {
+      clearMarkers(userPosition);
+    }
+    showCurrentLocation = false;
+    clearMarkers(momentaryMarker);
+
+    var markerId = MarkerId(DateTime.now().microsecondsSinceEpoch.toString());
+    var marker = Marker(markerId: markerId, position: position);
+
+    momentaryMarker = {
+      markerId: marker,
+    };
+
+    setMarkers(momentaryMarker);
+
+    if (_nearYou) {
+      clearMarkers(busStopsMap);
+      setNearMarkers(busStops);
+    }
+    // notifyListeners();
   }
 }

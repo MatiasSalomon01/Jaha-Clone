@@ -2,9 +2,11 @@ import 'package:ans_map_project/colors/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../overrides/slider_custom_track_shape.dart';
 import '../../providers/bus_provider.dart';
 import '../../providers/color_provider.dart';
 import '../../providers/sale_points_provider.dart';
+import '../custom_slider.dart';
 
 Future<dynamic> popUpOptions(
     BuildContext context,
@@ -149,31 +151,37 @@ void modalNearYou(
     useSafeArea: true,
     builder: (context) {
       return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         content: Container(
           color: white,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [CustomSlider()],
+            children: const [
+              CustomSlider(),
+            ],
           ),
         ),
         actions: [
-          TextButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(
-                Colors.grey.withOpacity(.1),
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            child: TextButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Colors.grey.withOpacity(.1),
+                ),
+                overlayColor: MaterialStateProperty.all(
+                  Colors.grey.withOpacity(.4),
+                ),
+                splashFactory: NoSplash.splashFactory,
               ),
-              overlayColor: MaterialStateProperty.all(
-                Colors.grey.withOpacity(.4),
-              ),
-              splashFactory: NoSplash.splashFactory,
-            ),
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Ok',
-              style: const TextStyle(
-                fontSize: 16,
-                color: black,
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Ok',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: black,
+                ),
               ),
             ),
           ),
@@ -181,105 +189,4 @@ void modalNearYou(
       );
     },
   );
-}
-
-class CustomSlider extends StatefulWidget {
-  const CustomSlider({
-    super.key,
-  });
-
-  @override
-  State<CustomSlider> createState() => _CustomSliderState();
-}
-
-class _CustomSliderState extends State<CustomSlider> {
-  double valor = 0;
-  @override
-  Widget build(BuildContext context) {
-    final busProvider = Provider.of<BusProvider>(context);
-    final colorProvider = Provider.of<ColorProvider>(context);
-    final size = MediaQuery.of(context).size;
-    valor = busProvider.distanceNearYou;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text.rich(
-          TextSpan(
-            children: [
-              const TextSpan(
-                text: 'Rango de distancia: ',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              TextSpan(
-                text: '${busProvider.distanceNearYou.round()}m',
-                style: const TextStyle(fontSize: 18),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          width: size.width,
-          child: SliderTheme(
-            data: SliderThemeData(trackShape: SliderCustomTrackShape()),
-            child: Slider(
-              divisions: 10,
-              activeColor: colorProvider.appColor,
-              value: valor,
-              max: 5000,
-              onChanged: (value) {
-                setState(() {
-                  valor = value;
-                });
-                busProvider.distanceNearYou = value;
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SliderCustomTrackShape extends RoundedRectSliderTrackShape {
-  @override
-  void paint(
-    PaintingContext context,
-    Offset offset, {
-    required RenderBox parentBox,
-    required SliderThemeData sliderTheme,
-    required Animation<double> enableAnimation,
-    required TextDirection textDirection,
-    required Offset thumbCenter,
-    Offset? secondaryOffset,
-    bool isDiscrete = false,
-    bool isEnabled = false,
-    double additionalActiveTrackHeight = 2,
-  }) {
-    super.paint(
-      context,
-      offset,
-      parentBox: parentBox,
-      sliderTheme: sliderTheme,
-      enableAnimation: enableAnimation,
-      textDirection: textDirection,
-      thumbCenter: thumbCenter,
-      additionalActiveTrackHeight: additionalActiveTrackHeight,
-    );
-  }
-
-  @override
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    required SliderThemeData sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    const double trackHeight = 5;
-    const double trackLeft = 0;
-    final double trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2;
-    final double trackWidth = parentBox.size.width;
-    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
-  }
 }
