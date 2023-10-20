@@ -145,6 +145,7 @@ class BusProvider extends ChangeNotifier {
 
   setNearMarkers(Set<Marker> markers) {
     Map<MarkerId, Marker> filteredMarkers = {};
+    Map<MarkerId, Marker> markersToDelete = {};
     double maxDistance = _distanceNearYou;
 
     var actualPosition = momentaryMarker.isEmpty
@@ -164,9 +165,16 @@ class BusProvider extends ChangeNotifier {
       if (distance <= maxDistance) {
         filteredMarkers[marker.markerId] = marker;
       }
-
-      setMarkers(filteredMarkers);
     }
+
+    var forDeletions = markers.difference(filteredMarkers.values.toSet());
+
+    for (var item in forDeletions) {
+      markersToDelete[item.markerId] = item;
+    }
+
+    clearMarkers(markersToDelete);
+    setMarkers(filteredMarkers);
   }
 
   Future<void> clearNearMarkers(Set<Marker> markers) async {

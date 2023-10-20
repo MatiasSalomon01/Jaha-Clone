@@ -55,16 +55,18 @@ class _CustomSliderState extends State<CustomSlider> {
                   valor = value;
                 });
 
-                if (value < busProvider.distanceNearYou) {
-                  // busProvider.clearMarkers(busProvider.busStopsMap);
-                  await busProvider.clearNearMarkers(busProvider.busStops);
-                  print('aaaaaaaaaaaaaaaaaaaaaaaa');
-                } else {
-                  busProvider.setNearMarkers(busProvider.busStops);
-                  print('yyyyyyyyyyyyyyyyyyyyyyyyy');
-                }
+                // if (value < busProvider.distanceNearYou) {
+                //   // busProvider.clearMarkers(busProvider.busStopsMap);
+                //   await busProvider.clearNearMarkers(busProvider.busStops);
+                //   print('aaaaaaaaaaaaaaaaaaaaaaaa');
+                // } else {
+                //   busProvider.setNearMarkers(busProvider.busStops);
+                //   print('yyyyyyyyyyyyyyyyyyyyyyyyy');
+                // }
 
+                busProvider.clearNearMarkers(busProvider.busStops);
                 busProvider.distanceNearYou = value;
+                busProvider.setNearMarkers(busProvider.busStops);
               },
             ),
           ),
