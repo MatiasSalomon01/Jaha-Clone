@@ -73,7 +73,7 @@ class BusProvider extends ChangeNotifier {
   }
 
   BusProvider() {
-    loadJsonData();
+    // loadJsonData();
     assetsToBytes('assets/bus-stop.png').then((value) {
       final bitMap = BitmapDescriptor.fromBytes(value);
       _busStopIcon.complete(bitMap);

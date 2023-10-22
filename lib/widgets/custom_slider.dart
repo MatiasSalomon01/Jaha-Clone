@@ -53,7 +53,9 @@ class _CustomSliderState extends State<CustomSlider> {
               onChanged: (value) async {
                 setState(() => valor = value);
                 busProvider.distanceNearYou = value;
-                busProvider.setNearMarkers(busProvider.busStops);
+                if (busProvider.nearYou && busProvider.isActive) {
+                  busProvider.setNearMarkers(busProvider.busStops);
+                }
               },
             ),
           ),
