@@ -24,49 +24,49 @@ class _HomeScreenState extends State<HomeScreen> {
           'assets/jaha-logo.png',
           height: 55,
         ),
-        actions: [
-          PopupMenuButton(
-            splashRadius: 40,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            padding: EdgeInsets.zero,
-            offset: const Offset(0, 45),
-            tooltip: '',
-            child: const Padding(
-              padding: EdgeInsets.only(right: 10),
-              child: Icon(
-                Icons.favorite,
-                // color: Colors.red,
-              ),
-            ),
-            itemBuilder: (context) {
-              return [
-                PopupMenuItem(
-                  padding: EdgeInsets.zero,
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return CheckboxListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 15),
-                        value: favorite,
-                        title: const Text(
-                          'Paradas favoritas',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        activeColor: colorProvider.appColor,
-                        onChanged: (_) async {
-                          setState(() => favorite = !favorite);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ];
-            },
-          )
-        ],
+        // actions: [
+        //   PopupMenuButton(
+        //     splashRadius: 40,
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(10),
+        //     ),
+        //     padding: EdgeInsets.zero,
+        //     offset: const Offset(0, 45),
+        //     tooltip: '',
+        //     child: const Padding(
+        //       padding: EdgeInsets.only(right: 10),
+        //       child: Icon(
+        //         Icons.favorite,
+        //         // color: Colors.red,
+        //       ),
+        //     ),
+        //     itemBuilder: (context) {
+        //       return [
+        //         PopupMenuItem(
+        //           padding: EdgeInsets.zero,
+        //           child: StatefulBuilder(
+        //             builder: (context, setState) {
+        //               return CheckboxListTile(
+        //                 contentPadding:
+        //                     const EdgeInsets.symmetric(horizontal: 15),
+        //                 value: favorite,
+        //                 title: const Text(
+        //                   'Paradas favoritas',
+        //                   maxLines: 1,
+        //                   overflow: TextOverflow.ellipsis,
+        //                 ),
+        //                 activeColor: colorProvider.appColor,
+        //                 onChanged: (_) async {
+        //                   setState(() => favorite = !favorite);
+        //                 },
+        //               );
+        //             },
+        //           ),
+        //         ),
+        //       ];
+        //     },
+        //   )
+        // ],
       ),
       body: const CustomMap(),
       floatingActionButton: const CustomFloatingActionButtom(),

@@ -71,7 +71,7 @@ class BusProvider extends ChangeNotifier {
 
   BusProvider() {
     loadJsonData();
-    assetsToBytes('assets/bus-stop.png', width: 150).then((value) {
+    assetsToBytes('assets/bus-stop.png').then((value) {
       final bitMap = BitmapDescriptor.fromBytes(value);
       _busStopIcon.complete(bitMap);
     });
@@ -126,7 +126,7 @@ class BusProvider extends ChangeNotifier {
   Future<void> loadJsonData() async =>
       _jsonString = await rootBundle.loadString('lib/data/bus-stops.json');
 
-  Future<Uint8List> assetsToBytes(String path, {int width = 100}) async {
+  Future<Uint8List> assetsToBytes(String path, {int width = 130}) async {
     final byteData = await rootBundle.load(path);
     final bytes = byteData.buffer.asUint8List();
     final codec = await ui.instantiateImageCodec(bytes, targetHeight: width);
