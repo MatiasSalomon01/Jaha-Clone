@@ -290,6 +290,11 @@ class BusProvider extends ChangeNotifier {
     }
     showCurrentLocation = !showCurrentLocation;
     clearMarkers(momentaryMarker);
+
+    if (_nearYou && isActive) {
+      clearMarkers(busStopsMap);
+      setNearMarkers(busStops);
+    }
   }
 
   disposeInfoController() {
