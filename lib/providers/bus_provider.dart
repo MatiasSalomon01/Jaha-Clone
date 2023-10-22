@@ -9,11 +9,14 @@ import '../services/services.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:http/http.dart' as http;
 
 import '../widgets/marker_window.dart';
 
 class BusProvider extends ChangeNotifier {
   late final String _jsonString;
+
+  static const String baseUrl = 'paradas-67928-default-rtdb.firebaseio.com';
 
   Map<MarkerId, Marker> _busStops = {};
   Set<Marker> get busStops => _busStops.values.toSet();
@@ -77,19 +80,38 @@ class BusProvider extends ChangeNotifier {
     });
   }
 
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  set isLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
   Future<void> getBusStops() async {
-    final List<dynamic> data = json.decode(_jsonString);
+    // final List<dynamic> data = json.decode(_jsonString);
+    isLoading = true;
     final icon = await _busStopIcon.future;
 
-    for (var i in data) {
-      final Map<String, dynamic> coordenates = i;
+    final url = Uri.https(baseUrl, '/paradas.json');
+    final response = await http.get(url);
+
+    final Map<String, dynamic> map = json.decode(response.body);
+
+    map.forEach((key, value) {
+      // final Map<String, dynamic> coordenates = value;
 
       final position = LatLng(
-        coordenates['latitude'],
-        coordenates['longitude'],
+        value['latitude'],
+        value['longitude'],
       );
 
-      final id = DateTime.now().microsecondsSinceEpoch.toString();
+      final List<dynamic> content = value['content'];
+
+      final info = content.map((e) => e.toString()).toList();
+
+      final id = key;
       final marketId = MarkerId(id);
       final marker = Marker(
         markerId: marketId,
@@ -97,14 +119,42 @@ class BusProvider extends ChangeNotifier {
         icon: icon,
         onTap: () {
           _customInfoWindowController.addInfoWindow!(
-            const MarkerWindow(),
+            MarkerWindow(
+              content: info,
+            ),
             position,
           );
         },
       );
 
       _busStops[marketId] = marker;
-    }
+    });
+
+    // for (var i in data) {
+    //   final Map<String, dynamic> coordenates = i;
+
+    //   final position = LatLng(
+    //     coordenates['latitude'],
+    //     coordenates['longitude'],
+    //   );
+
+    //   final id = DateTime.now().microsecondsSinceEpoch.toString();
+    //   final marketId = MarkerId(id);
+    //   final marker = Marker(
+    //     markerId: marketId,
+    //     position: position,
+    //     icon: icon,
+    //     onTap: () {
+    //       _customInfoWindowController.addInfoWindow!(
+    //         const MarkerWindow(),
+    //         position,
+    //       );
+    //     },
+    //   );
+
+    //   _busStops[marketId] = marker;
+    // }
+    isLoading = false;
     notifyListeners();
   }
 
@@ -280,8 +330,7 @@ class BusProvider extends ChangeNotifier {
     };
 
     setMarkers(momentaryMarker);
-
-    if (_nearYou) {
+    if (_nearYou && isActive) {
       clearMarkers(busStopsMap);
       setNearMarkers(busStops);
     }

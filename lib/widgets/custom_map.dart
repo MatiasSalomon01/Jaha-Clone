@@ -48,7 +48,16 @@ class _CustomMapState extends State<CustomMap> {
           height: 75,
           width: 150,
           offset: 55,
-        )
+        ),
+        if (busProvider.isLoading)
+          Container(
+            color: Colors.white.withOpacity(.5),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: colorProvider.appColor,
+              ),
+            ),
+          )
       ],
     );
   }
