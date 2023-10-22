@@ -46,8 +46,15 @@ Future<dynamic> popUpOptions(
                 onChanged: (_) {
                   busProvider.nearYou = !busProvider.nearYou;
                   setState(() => nearYou = busProvider.nearYou);
-                  if (busProvider.nearYou == false) {
-                    busProvider.clearMarkers(busProvider.busStopsMap);
+                  busProvider.clearMarkers(busProvider.busStopsMap);
+                  if (nearYou) {
+                    if (busProvider.isActive) {
+                      busProvider.setNearMarkers(busProvider.busStops);
+                    }
+                  } else {
+                    if (busProvider.isActive) {
+                      busProvider.setMarkers(busProvider.busStopsMap);
+                    }
                   }
                 },
                 trailingIcon: MaterialButton(
