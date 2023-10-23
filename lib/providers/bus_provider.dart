@@ -9,9 +9,14 @@ import '../services/services.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:http/http.dart' as http;
+
+import '../widgets/marker_window.dart';
 
 class BusProvider extends ChangeNotifier {
   late final String _jsonString;
+
+  static const String baseUrl = 'paradas-67928-default-rtdb.firebaseio.com';
 
   Map<MarkerId, Marker> _busStops = {};
   Set<Marker> get busStops => _busStops.values.toSet();
@@ -40,7 +45,7 @@ class BusProvider extends ChangeNotifier {
   final _busStopIcon = Completer<BitmapDescriptor>();
 
   bool isActive = false;
-  bool _nearYou = true;
+  bool _nearYou = false;
 
   bool get nearYou => _nearYou;
 
@@ -51,8 +56,10 @@ class BusProvider extends ChangeNotifier {
 
   bool showCurrentLocation = false;
 
-  Map<MarkerId, Marker> _userPosition = {};
+  Map<MarkerId, Marker> userPosition = {};
   Position position = Location.position;
+
+  Map<MarkerId, Marker> momentaryMarker = {};
 
   late GoogleMapController controller;
 
@@ -66,26 +73,45 @@ class BusProvider extends ChangeNotifier {
   }
 
   BusProvider() {
-    loadJsonData();
-    assetsToBytes('assets/bus-stop.png', width: 150).then((value) {
+    // loadJsonData();
+    assetsToBytes('assets/bus-stop.png').then((value) {
       final bitMap = BitmapDescriptor.fromBytes(value);
       _busStopIcon.complete(bitMap);
     });
   }
 
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  set isLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
   Future<void> getBusStops() async {
-    final List<dynamic> data = json.decode(_jsonString);
+    // final List<dynamic> data = json.decode(_jsonString);
+    isLoading = true;
     final icon = await _busStopIcon.future;
 
-    for (var i in data) {
-      final Map<String, dynamic> coordenates = i;
+    final url = Uri.https(baseUrl, '/paradas.json');
+    final response = await http.get(url);
+
+    final Map<String, dynamic> map = json.decode(response.body);
+
+    map.forEach((key, value) {
+      // final Map<String, dynamic> coordenates = value;
 
       final position = LatLng(
-        coordenates['latitude'],
-        coordenates['longitude'],
+        value['latitude'],
+        value['longitude'],
       );
 
-      final id = DateTime.now().microsecondsSinceEpoch.toString();
+      final List<dynamic> content = value['content'];
+
+      final info = content.map((e) => e.toString()).toList();
+
+      final id = key;
       final marketId = MarkerId(id);
       final marker = Marker(
         markerId: marketId,
@@ -93,33 +119,42 @@ class BusProvider extends ChangeNotifier {
         icon: icon,
         onTap: () {
           _customInfoWindowController.addInfoWindow!(
-            Container(
-                // width: 50,
-                // height: 50,
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.green),
-                    borderRadius: BorderRadius.circular(10)),
-                child: ListView(
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Línea 23'),
-                        Text('Línea 30 azul'),
-                        Text('Línea 30 amarillo'),
-                      ],
-                    ),
-                  ],
-                )),
+            MarkerWindow(
+              content: info,
+            ),
             position,
           );
         },
       );
 
       _busStops[marketId] = marker;
-    }
+    });
+
+    // for (var i in data) {
+    //   final Map<String, dynamic> coordenates = i;
+
+    //   final position = LatLng(
+    //     coordenates['latitude'],
+    //     coordenates['longitude'],
+    //   );
+
+    //   final id = DateTime.now().microsecondsSinceEpoch.toString();
+    //   final marketId = MarkerId(id);
+    //   final marker = Marker(
+    //     markerId: marketId,
+    //     position: position,
+    //     icon: icon,
+    //     onTap: () {
+    //       _customInfoWindowController.addInfoWindow!(
+    //         const MarkerWindow(),
+    //         position,
+    //       );
+    //     },
+    //   );
+
+    //   _busStops[marketId] = marker;
+    // }
+    isLoading = false;
     notifyListeners();
   }
 
@@ -141,7 +176,7 @@ class BusProvider extends ChangeNotifier {
   Future<void> loadJsonData() async =>
       _jsonString = await rootBundle.loadString('lib/data/bus-stops.json');
 
-  Future<Uint8List> assetsToBytes(String path, {int width = 100}) async {
+  Future<Uint8List> assetsToBytes(String path, {int width = 130}) async {
     final byteData = await rootBundle.load(path);
     final bytes = byteData.buffer.asUint8List();
     final codec = await ui.instantiateImageCodec(bytes, targetHeight: width);
@@ -160,12 +195,19 @@ class BusProvider extends ChangeNotifier {
 
   setNearMarkers(Set<Marker> markers) {
     Map<MarkerId, Marker> filteredMarkers = {};
+    Map<MarkerId, Marker> markersToDelete = {};
     double maxDistance = _distanceNearYou;
+
+    var actualPosition = momentaryMarker.isEmpty
+        ? userPosition.isEmpty
+            ? LatLng(position.latitude, position.longitude)
+            : userPosition.values.first.position
+        : momentaryMarker.values.first.position;
 
     for (var marker in markers) {
       double distance = Location.calculateDistance(
-        position.latitude,
-        position.longitude,
+        actualPosition.latitude,
+        actualPosition.longitude,
         marker.position.latitude,
         marker.position.longitude,
       );
@@ -173,13 +215,57 @@ class BusProvider extends ChangeNotifier {
       if (distance <= maxDistance) {
         filteredMarkers[marker.markerId] = marker;
       }
-
-      setMarkers(filteredMarkers);
     }
+
+    var forDeletions = markers.difference(filteredMarkers.values.toSet());
+
+    for (var item in forDeletions) {
+      markersToDelete[item.markerId] = item;
+    }
+
+    clearMarkers(markersToDelete);
+    setMarkers(filteredMarkers);
+  }
+
+  Future<void> clearNearMarkers(Set<Marker> markers) async {
+    Map<MarkerId, Marker> filteredMarkers = {};
+    double maxDistance = _distanceNearYou;
+
+    var actualPosition = momentaryMarker.isEmpty
+        ? userPosition.isEmpty
+            ? LatLng(position.latitude, position.longitude)
+            : userPosition.values.first.position
+        : momentaryMarker.values.first.position;
+
+    for (var marker in markers) {
+      double distance = Location.calculateDistance(
+        actualPosition.latitude,
+        actualPosition.longitude,
+        marker.position.latitude,
+        marker.position.longitude,
+      );
+
+      if (distance > maxDistance) {
+        filteredMarkers[marker.markerId] = marker;
+        if (_markers.containsKey(marker.markerId)) {
+          _markers.removeWhere(
+              (key, value) => key == marker.markerId && value == marker);
+        }
+      }
+    }
+
+    // for (var element in filteredMarkers.entries) {
+    //   if (_markers.containsKey(element.key)) {
+    //     _markers.removeWhere(
+    //         (key, value) => key == element.key && value == element.value);
+    //   }
+    // }
+    notifyListeners();
   }
 
   setCurrentLocationOnMap() {
     if (showCurrentLocation == false) {
+      clearMarkers(momentaryMarker);
       final id = DateTime.now().microsecondsSinceEpoch.toString();
       final marketId = MarkerId(id);
       final marker = Marker(
@@ -189,20 +275,26 @@ class BusProvider extends ChangeNotifier {
           position.longitude,
         ),
       );
-      _userPosition[marketId] = marker;
+      userPosition[marketId] = marker;
 
       controller.animateCamera(
         CameraUpdate.newLatLng(
           LatLng(position.latitude, position.longitude),
         ),
       );
-
-      setMarkers(_userPosition);
+      momentaryMarker = {};
+      setMarkers(userPosition);
     }
     if (showCurrentLocation == true) {
-      clearMarkers(_userPosition);
+      clearMarkers(userPosition);
     }
     showCurrentLocation = !showCurrentLocation;
+    clearMarkers(momentaryMarker);
+
+    if (_nearYou && isActive) {
+      clearMarkers(busStopsMap);
+      setNearMarkers(busStops);
+    }
   }
 
   disposeInfoController() {
@@ -213,12 +305,40 @@ class BusProvider extends ChangeNotifier {
     return {
       Circle(
         circleId: const CircleId('d7d02a51-a69a-4fed-b7da-47b011f7f59e'),
-        center: LatLng(position.latitude, position.longitude),
+        // center: LatLng(position.latitude, position.longitude),
+        center: momentaryMarker.isEmpty
+            ? userPosition.isEmpty
+                ? LatLng(position.latitude, position.longitude)
+                : userPosition.values.first.position
+            : momentaryMarker.values.first.position,
+
         radius: _distanceNearYou,
         strokeWidth: 2,
         fillColor: fillColor.withOpacity(.15),
         strokeColor: fillColor,
       ),
     };
+  }
+
+  void putMarker(LatLng position) {
+    if (showCurrentLocation == true) {
+      clearMarkers(userPosition);
+    }
+    showCurrentLocation = false;
+    clearMarkers(momentaryMarker);
+
+    var markerId = MarkerId(DateTime.now().microsecondsSinceEpoch.toString());
+    var marker = Marker(markerId: markerId, position: position);
+
+    momentaryMarker = {
+      markerId: marker,
+    };
+
+    setMarkers(momentaryMarker);
+    if (_nearYou && isActive) {
+      clearMarkers(busStopsMap);
+      setNearMarkers(busStops);
+    }
+    // notifyListeners();
   }
 }
